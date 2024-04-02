@@ -1,0 +1,97 @@
+<!-- This is nav html page -->
+
+<nav class="sticky-top navbar navbar-expand-lg bg-dark border-bottom border-body mb-3" data-bs-theme="dark">
+  <div class="container-fluid">
+
+    <!-- this is login start -->
+    {% if user.is_authenticated%}
+      <li class="nav-item btn dropdown">
+        <a class="nav-link dropdown-toggle text-white mx-2 text-capitalize " href="#" role="button"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          {{user}}
+        </a>
+        <ul class="dropdown-menu">
+          <li><form action="/logout/" method="POST">{% csrf_token %}<button class="btn" type="submit" >Logout</button></form></li>
+          <li><hr></li>
+
+          {% if user.is_superuser %}
+          <li>
+            <span class="mx-2 mb-2">Switch user </span>
+            <form action="/login/" method="POST">
+              {% csrf_token %}
+              <input required type="text" class="mx-2 px-1" placeholder="name" name="username" id="">
+              <input required type="password" class="mx-2 mt-1 px-1" placeholder="password" name="password" id="">
+              <button type="submit" class="btn btn-primary mx-2 mt-1 p-1 py-0">login</button>
+            </form>
+          </li>
+          {% endif %}
+        </ul>
+      </li>
+      {% else %}
+      <li  class="nav-item btn dropdown">
+        <a id="guest" class="nav-link dropdown-toggle text-white mx-2 text-capitalize " href="#" role="button"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          Guest
+        </a>
+        <ul class="dropdown-menu">
+          <li>
+            <span class="mx-2 mb-2">Sign In </span>
+            <form action="/login/" method="POST">
+              {% csrf_token %}
+              <input required type="text" class="mx-2 px-1" placeholder="name" name="username" id="">
+              <input required type="password" class="mx-2 mt-1 px-1" placeholder="password" name="password" id="">
+              <button type="submit" class="btn btn-primary mx-2 mt-1 p-1 py-0">login</button>
+            </form>
+            <li><hr></li>
+            <div class="mx-4"> or </div>
+            <li><hr></li>
+            <span class="mx-2 mb-2">Create Account</span>
+            <form action="/signUp/" method="POST">
+              {% csrf_token %}
+              <input required type="text" class="mx-2 px-1" placeholder="name" name="username" id="">
+              <input required type="password" class="mx-2 mt-1 px-1" placeholder="password" name="password" id="">
+              <input required type="password" class="mx-2 mt-1 px-1" placeholder="re-password" name="cpassword" id="">
+              <button type="submit" class="btn border border-white mx-2 mt-1 p-1 py-0">Sign Up</button>
+            </form>
+          </li>
+
+        </ul>
+      </li>
+      {% endif %}
+
+    <!-- this is login end -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">Home</a>
+        </li>
+
+        {% if user.is_superuser %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Users
+          </a>
+          <ul class="dropdown-menu">
+
+            {% for user in users %}
+            <li class="mx-2 mt-1 px-1">{{user.username}}</li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endif %}
+
+
+
+        <!-- <li class="text-white">Play video</li> -->
+
+
+
+
+      </form>
+    </div>
+  </div>
+</nav>

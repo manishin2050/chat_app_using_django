@@ -1,0 +1,148 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room: {{roomname}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <style>
+        *{
+            padding:0;
+            margin:0;
+            box-sizing:border-box;
+        }
+        body{
+            height:100%;
+            width:100%;
+
+
+        }
+        .chat{
+            height: 500px;
+            /* width: 100%; */
+            border: 5px solid black;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            padding-bottom: 100px;
+        }
+        .sender {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .message {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 5px;
+            width: fit-content;
+            border: 2px solid black;
+
+        }
+        #chatarea{
+            max-width: 100%;
+        }
+        .sent {
+            background-color: rgb(216, 82, 207);
+            font-weight: bold;
+            /* align-self: flex-end; */
+        }
+        .received {
+            background-color: rgb(110, 224, 110);
+            font-weight: bold;
+        }
+        .input-group-text {
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      border-top-left-radius: 0.25rem;
+      border-bottom-left-radius: 0.25rem;
+    }
+    .form-control {
+      border-top-right-radius: 0.25rem;
+      border-bottom-right-radius: 0.25rem;
+    }
+    </style>
+</head>
+<body>
+    {% include "nav.html" %}
+    <!-- <textarea name="" id="chatarea" cols="30" rows="10"></textarea> -->
+    <div id="scrolldown" class="container chat">
+
+        <div class="container" id="chatarea"></div>
+    </div>
+
+
+
+
+    <div class="input-group button container mt-3 text-center">
+        <input type="text" id="chatinput"  class="form-control " placeholder="Type your message...">
+        <div class="input-group-append">
+            <button id="chatbtn" class="btn btn-primary" type="button">Send</button>
+        </div>
+
+        <input hidden type="text" name="" value="{{user}}" id="user">
+            {{roomname|json_script:"roomname"}}
+
+    <script>
+
+        const roomname = JSON.parse(document.getElementById("roomname").textContent);
+        var user=document.getElementById('user').value
+        document.querySelector('#chatinput').focus()
+        document.querySelector('#chatinput').onkeyup=function(e){
+            if (e.keyCode===13){
+                document.querySelector('#chatbtn').click()
+            }
+        }
+        // websoclet part start
+        // yha mene srever create kiya
+        const chatsocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/' + roomname + '/'
+            );
+            // yha function me message ko handle kiya jayega
+            chatsocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const messageDiv = document.createElement('div');
+            const name = document.createElement('div');
+            // name.textContent=data.user;
+            name.classList.add('sender')
+            messageDiv.textContent = data.message;
+            messageDiv.classList.add('message');
+            if (data.user === user) {
+                messageDiv.classList.add('sent');
+                name.textContent="you:";
+            } else {
+                name.textContent=data.user+':';
+                messageDiv.classList.add('received');
+            }
+            const element = document.getElementById('scrolldown');
+            const scrollTop = element.scrollTop; // Number of pixels scrolled from the top
+            const scrollHeight = element.scrollHeight + 200; // Total height of the scrollable content
+            element.scrollTo(0,scrollHeight);
+            document.querySelector('#chatarea').appendChild(name);
+            document.querySelector('#chatarea').appendChild(messageDiv);
+            // Scroll to the bottom after adding a new message
+
+        };
+
+        document.getElementById('chatbtn').onclick = function(e) {
+            const msg = document.getElementById('chatinput').value;
+            chatsocket.send(JSON.stringify({'message': msg}));
+            document.getElementById('chatinput').value = '';
+
+
+        }
+
+        chatsocket.onclose = function(e) {
+            console.log('connection is closed now');
+        }
+        // websoclet part end
+    </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"crossorigin="anonymous"></script>
+
+</body>
+</html>
+
+
+
